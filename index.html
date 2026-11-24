@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>하이브리드 가계부</title>
+<meta name="description" content="급여일 기준 월간 요약과 카드 청구액 예측을 한눈에 보는 오프라인 가계부">
+<meta name="theme-color" content="#1f6b52">
+<meta name="color-scheme" content="light dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="가계부">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="stylesheet" href="./styles.css">
+<script src="./app.js" defer></script>
+</head>
+<body>
+<div class="app" id="app">
+  <header class="topbar">
+    <div class="topbar__brand">
+      <span class="brandmark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M5 3.5h11a2.5 2.5 0 0 1 2.5 2.5v14.5H7A2 2 0 0 1 5 18.5z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M5 18.5A2 2 0 0 1 7 16.5h11.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M9 7.5h6M9 10.5h4.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      </span>
+      <div class="topbar__titles">
+        <h1>하이브리드 가계부</h1>
+        <p id="topbar-sub">이번 달 요약</p>
+      </div>
+      <button class="icon-btn topbar__today" type="button" data-act="month-today" aria-label="이번 달로 이동">오늘</button>
+    </div>
+    <div class="monthbar">
+      <button class="monthbar__nav" type="button" data-act="month" data-delta="-1" aria-label="이전 달">‹</button>
+      <div class="monthbar__center">
+        <span id="month-label" class="monthbar__label">2026년 11월</span>
+        <span id="period-label" class="monthbar__period">11.1 – 11.30</span>
+      </div>
+      <button class="monthbar__nav" type="button" data-act="month" data-delta="1" aria-label="다음 달">›</button>
+    </div>
+  </header>
+
+  <main id="view" class="view" tabindex="-1"></main>
+
+  <nav class="tabbar" role="tablist" aria-label="메뉴">
+    <button class="tab" type="button" role="tab" data-act="tab" data-tab="summary" aria-selected="true">
+      <span class="tab__icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="23" height="23"><path d="M4 13h6V4H4zm0 7h6v-5H4zm10 0h6v-9h-6zm0-16v5h6V4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></span>
+      <span class="tab__label">요약</span>
+    </button>
+    <button class="tab" type="button" role="tab" data-act="tab" data-tab="fixed" aria-selected="false">
+      <span class="tab__icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="23" height="23"><path d="M7 3.5h13v17H7a2 2 0 0 1-2-2v-13a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 8h8M9 12h8M9 16h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+      <span class="tab__label">고정·계획</span>
+    </button>
+    <button class="tab" type="button" role="tab" data-act="tab" data-tab="variable" aria-selected="false">
+      <span class="tab__icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="23" height="23"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7.5v9M9.3 10h4.2a1.9 1.9 0 0 1 0 3.8H9.3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+      <span class="tab__label">변동·일상</span>
+    </button>
+    <button class="tab" type="button" role="tab" data-act="tab" data-tab="settings" aria-selected="false">
+      <span class="tab__icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="23" height="23"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1V21a2 2 0 1 1-4 0v-.2A1.6 1.6 0 0 0 7 19.4l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.6 1.6 0 0 0 3 13.9H3a2 2 0 1 1 0-4h.2A1.6 1.6 0 0 0 4.6 7l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.6 1.6 0 0 0 10 3V3a2 2 0 1 1 4 0v.2a1.6 1.6 0 0 0 2.7 1.1l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0 1.1 2.7H21a2 2 0 1 1 0 4h-.2a1.6 1.6 0 0 0-1.4 1z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></span>
+      <span class="tab__label">설정·백업</span>
+    </button>
+  </nav>
+</div>
+
+<div class="sheet" id="sheet" hidden>
+  <div class="sheet__backdrop" data-act="sheet-close"></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+    <div class="sheet__grip" aria-hidden="true"></div>
+    <div class="sheet__head">
+      <h2 id="sheet-title">제목</h2>
+      <button class="icon-btn" type="button" data-act="sheet-close" aria-label="닫기">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="sheet__body" id="sheet-body"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<input id="import-file" type="file" accept="application/json,.json" hidden>
+<noscript><p style="padding:24px">이 가계부는 자바스크립트가 필요합니다.</p></noscript>
+</body>
+</html>
